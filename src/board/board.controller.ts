@@ -25,6 +25,8 @@ export class BoardController {
   //게시글 상세 보기
   @Get('/articles/:id')
   getArticleById(@Param('id') articleId: number) {
+    //여기서 받는 값을 number로 작성했지만 실제 파라미터는 string으로 나온다.
+    // 그래서 여기서 다운받은 class-transformer 가 필요한 이유다. -> main으로 가서 작업해준다.
     return this.boardService.getArticleById(articleId);
   }
 
