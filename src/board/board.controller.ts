@@ -1,5 +1,16 @@
-import { Controller, Get, Post, Put, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+} from '@nestjs/common';
 import { BoardService } from './board.service';
+import { CreateArticleDto } from './create-article.dto';
+import { UpdateArticleDto } from './update-article.dto';
+import { DeleteArticleDto } from './delete-article.dto';
 
 @Controller('board') //routing path is /board -> e.g. http://localhost:3000/board
 export class BoardController {
@@ -13,25 +24,40 @@ export class BoardController {
 
   //게시글 상세 보기
   @Get('/articles/:id')
-  getArticleById() {
-    return this.boardService.getArticleById(id);
+  getArticleById(@Param('id') articleId: number) {
+    return this.boardService.getArticleById(articleId);
   }
 
   //게시글 작성
   @Post('/articles')
-  createArticle() {
-    return this.boardService.createArticle();
+  createArticle(@Body() data: CreateArticleDto) {
+    return this.boardService.createArticle(
+      data.title,
+      data.content,
+      data.password,
+    );
   }
 
   //게시글 수정
   @Put('/articles/:id')
-  updateArticle() {
-    return this.boardService.updateArticle(id);
+  updateArticle(
+    @Param('id') articleId: number,
+    @Body() data: UpdateArticleDto,
+  ) {
+    return this.boardService.updateArticle(
+      articleId,
+      data.title,
+      data.content,
+      data.password,
+    );
   }
 
   //게시글 삭제
   @Delete('/articles/:id')
-  deleteArticle() {
-    return this.boardService.deleteArticle(id);
+  deleteArticle(
+    @Param('id') articleId: number,
+    @Body() data: DeleteArticleDto,
+  ) {
+    return this.boardService.deleteArticle(articleId, data.password);
   }
 }
