@@ -18,16 +18,16 @@ export class BoardController {
 
   //게시글 목록을 가져오는 api
   @Get('/articles')
-  getArticles() {
-    return this.boardService.getArticles();
+  async getArticles() {
+    return await this.boardService.getArticles();
   }
 
   //게시글 상세 보기
   @Get('/articles/:id')
-  getArticleById(@Param('id') articleId: number) {
+  async getArticleById(@Param('id') articleId: number) {
     //여기서 받는 값을 number로 작성했지만 실제 파라미터는 string으로 나온다.
     // 그래서 여기서 다운받은 class-transformer 가 필요한 이유다. -> main으로 가서 작업해준다.
-    return this.boardService.getArticleById(articleId);
+    return await this.boardService.getArticleById(articleId);
   }
 
   //게시글 작성
@@ -43,11 +43,11 @@ export class BoardController {
 
   //게시글 수정
   @Put('/articles/:id')
-  updateArticle(
+  async updateArticle(
     @Param('id') articleId: number,
     @Body() data: UpdateArticleDto,
   ) {
-    return this.boardService.updateArticle(
+    return await this.boardService.updateArticle(
       articleId,
       data.title,
       data.content,
@@ -57,10 +57,10 @@ export class BoardController {
 
   //게시글 삭제
   @Delete('/articles/:id')
-  deleteArticle(
+  async deleteArticle(
     @Param('id') articleId: number,
     @Body() data: DeleteArticleDto,
   ) {
-    return this.boardService.deleteArticle(articleId, data.password);
+    return await this.boardService.deleteArticle(articleId, data.password);
   }
 }
