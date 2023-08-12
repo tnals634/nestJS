@@ -13,52 +13,63 @@ export class BoardService {
   constructor(
     @InjectRepository(Article) private articleRepository: Repository<Article>,
   ) {}
-  private articles = [];
 
-  // 게시글 비밀번호를 저장하기 위한 Map 객체입니다.
-  private articlePasswords = new Map();
-  getArticles() {
-    return this.articles;
-  }
-
-  getArticleById(id: number) {
-    return this.articles.find((article) => {
-      return article.id === id;
+  async getArticles() {
+    return await this.articleRepository.find({
+      where: { deletedAt: null },
+      select: ['id', 'author', 'title', 'createdAt'],
     });
   }
 
-  createArticle(title: string, content: string, password: number) {
-    const articleId = this.articles.length + 1;
-    this.articles.push({ id: articleId, title, content });
-    this.articlePasswords.set(articleId, password);
-    return articleId;
+  async getArticleById(id: number) {
+    return await this.articleRepository.findOne({
+      where: { id, deletedAt: null },
+      select: ['author', 'title', 'content', 'createdAt', 'updatedAt'],
+    });
   }
 
-  updateArticle(id: number, title: string, content: string, password: number) {
-    if (this.articlePasswords.get(id) !== password) {
+  createArticle(
+    author: string,
+    title: string,
+    content: string,
+    password: number,
+  ) {
+    this.articleRepository.insert({
+      author,
+      title,
+      content,
+      password: password.toString(),
+    });
+  }
+
+  async updateArticle(
+    id: number,
+    title: string,
+    content: string,
+    password: number,
+  ) {
+    await this.checkPassword(id, password);
+    this.articleRepository.update(id, { title, content });
+  }
+
+  async deleteArticle(id: number, password: number) {
+    await this.checkPassword(id, password);
+
+    this.articleRepository.softDelete(id);
+  }
+
+  private async checkPassword(id: number, password: number) {
+    const article = await this.articleRepository.findOne({
+      where: { id, deletedAt: null },
+      select: ['password'],
+    });
+    if (_.isNil(article)) {
+      throw new NotFoundException(`Article not found. id: ${id}`);
+    }
+    if (article.password !== password.toString()) {
       throw new UnauthorizedException(
         `Article password is not corrent. id: ${id}`,
       );
     }
-
-    const article = this.getArticleById(id);
-    if (_.isNil(article)) {
-      throw new NotFoundException(`Article not found. id: ${id}`);
-    }
-
-    article.title = title;
-    article.content = content;
-  }
-
-  deleteArticle(id: number, password: number) {
-    if (this.articlePasswords.get(id) !== password) {
-      throw new UnauthorizedException(
-        `Article password is not correct. id: ${id}`,
-      );
-    }
-
-    this.articles = this.articles.filter((article) => {
-      article.id !== id;
-    });
   }
 }

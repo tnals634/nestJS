@@ -2,6 +2,9 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class CreateArticleDto {
   @IsString()
+  readonly author: string;
+
+  @IsString()
   readonly title: string;
 
   @IsString()

@@ -34,6 +34,7 @@ export class BoardController {
   @Post('/articles')
   createArticle(@Body() data: CreateArticleDto) {
     return this.boardService.createArticle(
+      data.author,
       data.title,
       data.content,
       data.password,
