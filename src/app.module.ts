@@ -5,6 +5,7 @@ import { BoardModule } from './board/board.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './config/typeorm.config.service';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
       useClass: TypeOrmConfigService, // DB 관련 설정이 있는 서비스 파일을 불러와요!
     }),
     BoardModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
