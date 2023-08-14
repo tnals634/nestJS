@@ -33,7 +33,9 @@ export class UserService {
       );
     }
 
-    // 뭔가 허전합니다
+    const payload = { id: user.id };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return accessToken;
   }
 
   async createUser(userId: string, name: string, password: string) {
@@ -42,13 +44,15 @@ export class UserService {
       throw new ConflictException(`User already exists. userId: ${userId}`);
     }
 
-    await this.userRepository.insert({
+    const insertResult = await this.userRepository.insert({
       userId,
       name,
       password,
     });
 
-    // 역시나 뭔가 허전합니다
+    const payload = { id: insertResult.identifiers[0].id };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return accessToken;
   }
 
   updateUser(userId: string, name: string, password: string) {
