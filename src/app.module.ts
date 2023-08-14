@@ -14,7 +14,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtConfigService } from './config/jwt.config.service';
 import { AuthMiddleware } from './auth/auth.middleware';
-
+import { CacheModule } from '@nestjs/cache-manager';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -28,17 +28,21 @@ import { AuthMiddleware } from './auth/auth.middleware';
       useClass: JwtConfigService,
       inject: [ConfigService],
     }),
+    CacheModule.register({
+      ttl: 60000, // 데이터 캐싱 시간(밀리 초 단위, 1000 = 1초)
+      max: 100, // 최대 캐싱 개수
+      isGlobal: true,
+    }),
     BoardModule,
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthMiddleware], // AuthMiddleware 추가해주셔야 해요!
+  providers: [AppService, AuthMiddleware],
 })
 export class AppModule implements NestModule {
-  // NestModule 인터페이스 구현
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(AuthMiddleware) // 미들웨어 적용!
+      .apply(AuthMiddleware)
       .forRoutes({ path: 'user/update', method: RequestMethod.PUT });
   }
 }
