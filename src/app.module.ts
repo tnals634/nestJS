@@ -15,6 +15,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtConfigService } from './config/jwt.config.service';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -33,11 +35,22 @@ import { CacheModule } from '@nestjs/cache-manager';
       max: 100, // 최대 캐싱 개수
       isGlobal: true,
     }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10, // ttl 동안 limit 만큼의 요청만 받는다.
+    }),
     BoardModule,
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthMiddleware],
+  providers: [
+    AppService,
+    AuthMiddleware,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

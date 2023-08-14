@@ -11,18 +11,21 @@ import { BoardService } from './board.service';
 import { CreateArticleDto } from './create-article.dto';
 import { UpdateArticleDto } from './update-article.dto';
 import { DeleteArticleDto } from './delete-article.dto';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 
 @Controller('board') //routing path is /board -> e.g. http://localhost:3000/board
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   //게시글 목록을 가져오는 api
+  @SkipThrottle() // 데코레이터 추가!
   @Get('/articles')
   async getArticles() {
     return await this.boardService.getArticles();
   }
 
   //게시글 상세 보기
+  @Throttle(5, 60) // 이렇게 하면 60초에 5번 호출만 가능!
   @Get('/articles/:id')
   async getArticleById(@Param('id') articleId: number) {
     //여기서 받는 값을 number로 작성했지만 실제 파라미터는 string으로 나온다.
