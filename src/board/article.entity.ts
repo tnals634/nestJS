@@ -21,14 +21,17 @@ export class Article {
   @Column('varchar', { length: 1000 })
   content: string;
 
-  @Column('varchar', { select: false })
+  @Column('varchar', { length: 10, select: false })
   password: string;
+
+  @Column('int')
+  view: number; // 새로 추가된 컬럼!
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date | null;
 
   @DeleteDateColumn()
   deletedAt: Date | null;

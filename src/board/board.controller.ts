@@ -29,6 +29,11 @@ export class BoardController {
     // 그래서 여기서 다운받은 class-transformer 가 필요한 이유다. -> main으로 가서 작업해준다.
     return await this.boardService.getArticleById(articleId);
   }
+  // 새롭게 추가한 API
+  @Get('/hot-articles')
+  async getHotArticles() {
+    return await this.boardService.getHotArticles();
+  }
 
   //게시글 작성
   @Post('/articles')
@@ -38,6 +43,7 @@ export class BoardController {
       data.title,
       data.content,
       data.password,
+      data.view,
     );
   }
 
@@ -52,6 +58,7 @@ export class BoardController {
       data.title,
       data.content,
       data.password,
+      data.view,
     );
   }
 
